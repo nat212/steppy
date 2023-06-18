@@ -1,6 +1,7 @@
 plugins {
 	id 'fabric-loom' version '1.2-SNAPSHOT'
 	id 'maven-publish'
+	id 'com.modrinth.minotaur' version '2.+'
 }
 
 version = project.mod_version
@@ -74,4 +75,19 @@ publishing {
 		// The repositories here will be used for publishing your artifact, not for
 		// retrieving dependencies.
 	}
+}
+
+modrinth {
+	token = System.getenv("MODRINTH_TOKEN")
+	projectId = "steppy"
+	versionNumber = ${project.mod_version}
+	versionType = "release"
+	uploadFile = remapJar
+	gameVersions = ["1.20", "1.20.1"]
+	loaders = ["fabric"]
+	dependencies {
+		required.project "9s6osm5g"
+	}
+
+	syncBodyFrom = rootProject.file("README.md").text
 }

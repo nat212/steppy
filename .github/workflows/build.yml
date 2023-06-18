@@ -16,6 +16,8 @@ jobs:
         ]
         # and run on both Linux and Windows
         os: [ubuntu-22.04, windows-2022]
+    env:
+      MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: checkout repository
@@ -38,3 +40,6 @@ jobs:
         with:
           name: Artifacts
           path: build/libs/
+      - name: release to modrinth
+        if: ${{ github.event_name == 'push' && github.event.ref == 'main' && runner.os == 'Linux' && matrix.java == '17' }} # Only on pushes to main, and only on latest Java & Linux
+        run: ./gradlew modrinth

@@ -17,22 +17,28 @@ public abstract class ClientPlayerEntityMixin {
 
   private static float originalStepHeight = -1.0f;
 
-  @Shadow public abstract boolean isSneaking();
-  @Shadow public boolean autoJumpEnabled;
+  @Shadow
+  public abstract boolean isSneaking();
+
 
   private boolean shouldEnableSteppy() {
-    boolean enableSteppy = ModConfig.get().enableSteppy ;
+    boolean enableSteppy = ModConfig.get().enableSteppy;
     boolean enableSteppyWhenSneaking = ModConfig.get().enableSteppyWhenSneaking;
     return enableSteppy && (!this.isSneaking() || enableSteppyWhenSneaking);
   }
 
+  private void storeOriginalStepHeight() {
+    originalStepHeight = ((Entity) (Object) this).getStepHeight();
+  }
+
   @Inject(method = "move", at = @At(value = "HEAD"))
   private void steppy(MovementType movementType, Vec3d movement, CallbackInfo callback) {
+    if (originalStepHeight < 0) {
+      this.storeOriginalStepHeight();
+    }
+
     Entity thisEntity = ((Entity) (Object) this);
     if (this.shouldEnableSteppy()) {
-      if (originalStepHeight < 0) {
-        originalStepHeight = thisEntity.getStepHeight();
-      }
       thisEntity.setStepHeight(ModConfig.get().stepHeight);
     } else {
       thisEntity.setStepHeight(originalStepHeight);

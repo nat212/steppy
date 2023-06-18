@@ -80,7 +80,7 @@ publishing {
 modrinth {
 	token = System.getenv("MODRINTH_TOKEN")
 	projectId = "steppy"
-	versionNumber = ${project.mod_version}
+	versionNumber = project.mod_version
 	versionType = "release"
 	uploadFile = remapJar
 	gameVersions = ["1.20", "1.20.1"]

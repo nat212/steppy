@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "steppy",
+  "version": "${version}",
+  "name": "Steppy",
+  "description": "This is an example description! Tell everyone what your mod is about!",
+  "authors": [
+    "Me!"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/steppy",
+    "sources": "https://github.com/nat212/steppy"
+  },
+  "license": "Insert License Here",
+  "icon": "assets/steppy/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.natashadraper.steppy.fabric.SteppyModFabric"
+    ]
+  },
+  "depends": {
+    "fabric": "*",
+    "minecraft": ">=1.20.1",
+    "architectury": ">=9.1.12"
+  }
+}

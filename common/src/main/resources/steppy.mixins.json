@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "package": "za.co.natashadraper.steppy.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "minVersion": "0.8",
+  "client": [
+    "SteppyPlayerMixin"
+  ],
+  "mixins": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

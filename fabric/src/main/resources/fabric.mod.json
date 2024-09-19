@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "steppy",
+  "version": "${version}",
+  "name": "Steppy",
+  "description": "Take the big steppy you've always dreamed of!",
+  "authors": [
+    "Natasha Draper"
+  ],
+  "contact": {
+    "homepage": "https://modrinth.com/mod/steppy",
+    "sources": "https://github.com/nat212/steppy"
+  },
+  "license": "MIT",
+  "icon": "assets/steppy/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "za.co.natashadraper.steppy.fabric.SteppyModFabric"
+    ],
+    "client": [
+      "za.co.natashadraper.steppy.fabric.client.SteppyModFabricClient"
+    ],
+    "modmenu": [
+      "za.co.natashadraper.steppy.fabric.config.SteppyModMenuIntegration"
+    ]
+  },
+  "mixins": [
+    "steppy.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.5",
+    "minecraft": "~1.21",
+    "java": ">=21"
+  },
+  "suggests": {
+    "modmenu": "*"
+  }
+}

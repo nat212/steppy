@@ -1,0 +1,31 @@
+modLoader = "javafml"
+loaderVersion = "[4,)"
+issueTrackerURL = "https://github.com/nat212/steppy/issues"
+license = "Insert License Here"
+
+[[mods]]
+modId = "steppy"
+version = "${version}"
+displayName = "Steppy"
+authors = "Natasha Draper"
+description = '''
+Take the big steppy you've always dreamed of!
+'''
+logoFile = "assets/steppy/icon.png"
+
+[[dependencies.steppy]]
+modId = "neoforge"
+type = "required"
+versionRange = "[21.0,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.steppy]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21,)"
+ordering = "NONE"
+side = "BOTH"
+
+[[mixins]]
+config = "steppy.mixins.json"

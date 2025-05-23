@@ -23,7 +23,7 @@ public abstract class SteppyPlayerMixin {
     @Shadow
     public abstract boolean isSneaking();
 
-    private static final Identifier STEP_HEIGHT_ATTRIBUTE_ID = Identifier.ofVanilla("generic.step_height");
+    private static final Identifier STEP_HEIGHT_ATTRIBUTE_ID = Identifier.ofVanilla("step_height");
     private static final RegistryEntry<EntityAttribute> STEP_HEIGHT_ATTRIBUTE = Registries.ATTRIBUTE.getEntry(STEP_HEIGHT_ATTRIBUTE_ID).get();
     private static final Identifier STEPPY_MODIFIER_ID = Identifier.of(SteppyMod.MOD_ID, "step_height");
 

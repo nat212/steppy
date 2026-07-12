@@ -1,6 +1,5 @@
 package za.co.natashadraper.steppy.mixin;
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.MovementType;
 import net.minecraft.entity.attribute.EntityAttribute;
@@ -9,7 +8,6 @@ import net.minecraft.registry.Registries;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
-import org.slf4j.Logger;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -28,19 +26,27 @@ public abstract class SteppyPlayerMixin {
     private static final Identifier STEP_HEIGHT_ATTRIBUTE_ID = Identifier.ofVanilla("step_height");
     @Unique
     private static final RegistryEntry<EntityAttribute> STEP_HEIGHT_ATTRIBUTE = Registries.ATTRIBUTE.getEntry(STEP_HEIGHT_ATTRIBUTE_ID).get();
+
+    // Captured lazily the first time we are about to modify the step height, so it
+    // reflects the real vanilla base value (0.6). We deliberately do NOT capture this
+    // in a mixin constructor: mixin constructor injection is unreliable and could leave
+    // a final field at 0.0, which would make disableSteppy() set the step height to 0 and
+    // trap the player while sneaking (vanilla's maybeBackOffFromEdge uses step height as
+    // the ledge-detection fall distance, so a 0 step height reads every drop as a cliff).
     @Unique
-    private static final Logger LOGGER = LogUtils.getLogger();
+    private double steppy$defaultStepHeight;
+    @Unique
+    private boolean steppy$defaultStepHeightCaptured = false;
 
     @Unique
-    private final double steppy$defaultStepHeight;
-
-    public SteppyPlayerMixin() {
-        LOGGER.info("[SteppyPlayerMixin] Initializing SteppyPlayerMixin");
+    private void steppy$captureDefaultStepHeight() {
+        if (steppy$defaultStepHeightCaptured) {
+            return;
+        }
         var stepHeightAttribute = steppy$getStepHeightAttribute();
         assert stepHeightAttribute != null;
         this.steppy$defaultStepHeight = stepHeightAttribute.getBaseValue();
-        LOGGER.info("[SteppyPlayerMixin] Storing default step height of {}", steppy$defaultStepHeight);
-        LOGGER.info("[SteppyPlayerMixin] SteppyPlayerMixin initialised");
+        this.steppy$defaultStepHeightCaptured = true;
     }
 
     @Unique
@@ -58,7 +64,15 @@ public abstract class SteppyPlayerMixin {
     }
 
     @Unique
+    private boolean steppy$active = false;
+
+    @Unique
     private void steppy$disableSteppy() {
+        // If we never captured the vanilla default there is nothing meaningful to restore
+        // to, and writing an uninitialised 0.0 would trap the player while sneaking.
+        if (!steppy$defaultStepHeightCaptured) {
+            return;
+        }
         var stepHeightAttribute = steppy$getStepHeightAttribute();
         assert stepHeightAttribute != null;
         stepHeightAttribute.setBaseValue(steppy$defaultStepHeight);
@@ -66,6 +80,7 @@ public abstract class SteppyPlayerMixin {
 
     @Unique
     private void steppy$setSteppyHeight(double stepHeight) {
+        steppy$captureDefaultStepHeight();
         var stepHeightAttribute = steppy$getStepHeightAttribute();
         assert stepHeightAttribute != null;
         stepHeightAttribute.setBaseValue(stepHeight);
@@ -74,10 +89,17 @@ public abstract class SteppyPlayerMixin {
     @Inject(method = "move", at = @At("HEAD"))
     private void steppy(MovementType movementType, Vec3d movement, CallbackInfo ci) {
         if (!steppy$shouldEnableSteppy()) {
-            steppy$disableSteppy();
+            // Restore the vanilla step height once when transitioning from enabled to
+            // disabled, so vanilla movement (including sneaking off non-full blocks such
+            // as slabs) behaves exactly as it would without the mod.
+            if (steppy$active) {
+                steppy$disableSteppy();
+                steppy$active = false;
+            }
             return;
         }
         steppy$setSteppyHeight(SteppyConfig.get().stepHeight);
+        steppy$active = true;
     }
 
     @Inject(method = "shouldAutoJump", at = @At(value = "HEAD"), cancellable = true)
